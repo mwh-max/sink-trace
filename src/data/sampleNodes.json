@@ -1,0 +1,5 @@
+{
+  "nodeA": { "pressure": 32, "flowDirection": "normal" },
+  "nodeB": { "pressure": 28, "flowDirection": "reversed" },
+  "nodeC": { "pressure": 24, "flowDirection": "normal" }
+}

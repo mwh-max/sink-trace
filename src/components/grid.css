@@ -1,0 +1,49 @@
+/* ⬇️ Grid Layout: Flexible & Adaptive */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+  justify-items: center;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* ⬇️ Junction Card Styling */
+.grid-node {
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #f2f2f2;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 160px;
+  min-height: 120px;
+  font-size: 1rem;
+  line-height: 1.4;
+  transition: all 0.3s ease;
+}
+
+/* ⬇️ Flagged Junction Alert Styling */
+.grid-node.low-pressure {
+  background-color: #ffeaea;
+  border: 2px solid #c0392b;
+  box-shadow: 0 0 10px #c0392b;
+  animation: pulse 1s infinite;
+}
+
+/* ⬇️ Critical Pulse Animation */
+@keyframes pulse {
+  0% { box-shadow: 0 0 5px #c0392b; }
+  50% { box-shadow: 0 0 15px #c0392b; }
+  100% { box-shadow: 0 0 5px #c0392b; }
+}
+
+/* ⬇️ Mobile Scaling & Readability */
+@media (max-width: 500px) {
+  .grid-node {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 0.75rem;
+  }
+}
+
