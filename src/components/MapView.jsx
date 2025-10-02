@@ -5,6 +5,7 @@ import {
   CircleMarker,
   Tooltip,
   useMap,
+  ZoomControl,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -38,6 +39,7 @@ export default function MapView({ nodes }) {
       zoomControl={false}
       preferCanvas={true}
     >
+      <ZoomControl position="topright" />
       <InvalidateOnLoad />
 
       <TileLayer
