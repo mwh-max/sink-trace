@@ -42,6 +42,11 @@ p {
 
 .leaflet-container .leaflet-pane img,
 .leaflet-container .leaflet-tile,
-.leaflet-container imag.leaflet-image-layer {
+.leaflet-container img.leaflet-image-layer {
   max-width: none !important;
+}
+
+.leaflet-container {
+  background: #f9f9f9;
+  overflow: hidden;
 }
