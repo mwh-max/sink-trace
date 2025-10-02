@@ -31,7 +31,7 @@ export default function MapView({ nodes }) {
       minZoom={7}
       maxZoom={14}
       style={{
-        height: "500px",
+        height: "min(62vh, 600px)",
         width: "100%",
         borderRadius: "8px",
         overflow: "hidden",
