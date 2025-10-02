@@ -1,5 +1,17 @@
 {
-  "nodeA": { "pressure": 32, "flowDirection": "normal" },
-  "nodeB": { "pressure": 28, "flowDirection": "reversed" },
-  "nodeC": { "pressure": 24, "flowDirection": "normal" }
+  "nodeA": {
+    "pressure": 32,
+    "flowDirection": "normal",
+    "coords": [38.04, -84.5]
+  },
+  "nodeB": {
+    "pressure": 28,
+    "flowDirection": "reversed",
+    "coords": [38.05, -84.49]
+  },
+  "nodeC": {
+    "pressure": 24,
+    "flowDirection": "normal",
+    "coords": [38.06, -84.48]
+  }
 }
