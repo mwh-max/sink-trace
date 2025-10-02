@@ -5,7 +5,9 @@ body {
   color: #333;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   margin: 0.5rem 0;
 }
 
@@ -36,4 +38,10 @@ li {
 
 p {
   margin: 0.4rem 0;
+}
+
+.leaflet-container .leaflet-pane img,
+.leaflet-container .leaflet-tile,
+.leaflet-container imag.leaflet-image-layer {
+  max-width: none !important;
 }
