@@ -12,11 +12,11 @@ export function useNodes() {
     try {
       const stored = localStorage.getItem(NODES_KEY);
       const raw = stored ? JSON.parse(stored) : sampleNodes;
-      return { nodes: validateNodes(raw), error: null };
+      return { nodes: validateNodes(raw) };
     } catch {
       // Corrupt or outdated storage — discard and use defaults
       try { localStorage.removeItem(NODES_KEY); } catch { /* ignore */ }
-      return { nodes: validateNodes(sampleNodes), error: null };
+      return { nodes: validateNodes(sampleNodes) };
     }
   }, []);
 }

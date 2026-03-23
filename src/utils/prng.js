@@ -16,7 +16,8 @@ export function createRng(seed) {
 export function loadSeed() {
   try {
     const stored = localStorage.getItem(SEED_KEY);
-    return stored ? parseInt(stored, 10) : Date.now();
+    const parsed = stored ? parseInt(stored, 10) : NaN;
+    return Number.isFinite(parsed) ? parsed : Date.now();
   } catch {
     return Date.now();
   }
