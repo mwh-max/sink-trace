@@ -4,36 +4,8 @@ import MapView from "./components/MapView.jsx";
 import MapErrorBoundary from "./components/MapErrorBoundary.jsx";
 import sampleNodes from "./data/sampleNodes.json";
 import "./App.css";
-import simulateFlow from "./utils/simulateFlow.js";
+import { reducer, MAX_LOG_ENTRIES } from "./utils/appReducer.js";
 import { COLOR_SAFE, COLOR_CRITICAL } from "./utils/colors.js";
-
-const MAX_LOG_ENTRIES = 20;
-
-function runSimulationStep(prevNodes) {
-  const updated = simulateFlow(prevNodes);
-  const newEntries = Object.entries(updated)
-    .filter(([key, node]) => node.flagged && !prevNodes[key].flagged)
-    .map(([key, node]) => ({
-      id: key,
-      pressure: node.pressure,
-      flaggedAt: node.flaggedAt,
-    }));
-  return { updated, newEntries };
-}
-
-function reducer(state, action) {
-  if (action.type === "simulate") {
-    const { updated, newEntries } = runSimulationStep(state.nodes);
-    return {
-      nodes: updated,
-      logEntries:
-        newEntries.length > 0
-          ? [...newEntries, ...state.logEntries].slice(0, MAX_LOG_ENTRIES)
-          : state.logEntries,
-    };
-  }
-  return state;
-}
 
 export default function App() {
   const [{ nodes, logEntries }, dispatch] = useReducer(reducer, {
