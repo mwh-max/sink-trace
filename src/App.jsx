@@ -1,63 +1,48 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import GridMap from "./components/GridMap.jsx";
 import MapView from "./components/MapView.jsx";
+import MapErrorBoundary from "./components/MapErrorBoundary.jsx";
 import sampleNodes from "./data/sampleNodes.json";
 import "./App.css";
 import simulateFlow from "./utils/simulateFlow.js";
+
+function runSimulationStep(prevNodes) {
+  const updated = simulateFlow(prevNodes);
+  const newEntries = Object.entries(updated)
+    .filter(([key, node]) => node.flagged && !prevNodes[key].flagged)
+    .map(([key, node]) => ({
+      key: `${key}-${node.flaggedAt}`,
+      id: key,
+      pressure: node.pressure,
+      time: new Date(node.flaggedAt).toLocaleTimeString(),
+    }));
+  return { updated, newEntries };
+}
 
 export default function App() {
   const [nodes, setNodes] = useState(sampleNodes);
   const [logEntries, setLogEntries] = useState([]);
   const [view, setView] = useState("grid");
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNodes((prevNodes) => {
-        const updated = simulateFlow(prevNodes);
-
-        const newEntries = Object.entries(updated)
-          .filter(([key, node]) => node.flagged && !prevNodes[key].flagged)
-          .map(([key, node]) => ({
-            id: key,
-            pressure: node.pressure,
-            time: new Date(node.flaggedAt).toLocaleTimeString(),
-          }));
-
-        if (newEntries.length > 0) {
-          setLogEntries((prev) => [...newEntries, ...prev.slice(0, 19)]);
-        }
-
-        return updated;
-      });
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleSimulate = () => {
+  const applySimulation = useCallback(() => {
     setNodes((prevNodes) => {
-      const updated = simulateFlow(prevNodes);
-
-      const newEntries = Object.entries(updated)
-        .filter(([key, node]) => node.flagged && !prevNodes[key].flagged)
-        .map(([key, node]) => ({
-          id: key,
-          pressure: node.pressure,
-          time: new Date(node.flaggedAt).toLocaleTimeString(),
-        }));
-
+      const { updated, newEntries } = runSimulationStep(prevNodes);
       if (newEntries.length > 0) {
         setLogEntries((prev) => [...newEntries, ...prev.slice(0, 19)]);
       }
-
       return updated;
     });
-  };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(applySimulation, 3000);
+    return () => clearInterval(interval);
+  }, [applySimulation]);
 
   const hasFlagged = Object.values(nodes).some((n) => n.flagged);
 
   return (
-    <div style={{ border: "3px solid magenta", padding: "2rem" }}>
+    <div style={{ padding: "2rem" }}>
       <div
         style={{
           marginBottom: "1rem",
@@ -80,7 +65,7 @@ export default function App() {
         junctions.
       </p>
 
-      <button onClick={handleSimulate}>Run Pressure Diagnostic</button>
+      <button onClick={applySimulation}>Run Pressure Diagnostic</button>
 
       <button
         style={{ marginLeft: "1rem" }}
@@ -100,19 +85,21 @@ export default function App() {
           : "✅ All junctions operating within normal pressure ranges"}
       </p>
 
-      <div style={{ border: "3px dashed cyan", marginTop: "1rem" }}>
+      <div style={{ marginTop: "1rem" }}>
         {view === "grid" ? (
           <GridMap nodes={nodes} />
         ) : (
-          <MapView nodes={nodes} />
+          <MapErrorBoundary>
+            <MapView nodes={nodes} />
+          </MapErrorBoundary>
         )}
       </div>
 
       <div style={{ marginTop: "2rem" }}>
         <h3>📝 Pressure Loss Log</h3>
         <ul>
-          {logEntries.map((entry, index) => (
-            <li key={index}>
+          {logEntries.map((entry) => (
+            <li key={entry.key}>
               {entry.time} — Junction {entry.id} dropped to {entry.pressure} psi
             </li>
           ))}

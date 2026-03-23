@@ -1,20 +1,19 @@
-console.log("✅ simulateFlow module is loading");
-
 const PRESSURE_MIN = 30;
+const PRESSURE_MAX = 120;
 
 export default function simulateFlow(nodes) {
   const updated = {};
 
   for (const [key, node] of Object.entries(nodes)) {
     const variation = Math.floor(Math.random() * 6 - 3);
-    const newPressure = node.pressure + variation;
+    const newPressure = Math.min(Math.max(node.pressure + variation, 0), PRESSURE_MAX);
     const isFlagged = newPressure < PRESSURE_MIN;
 
     updated[key] = {
       ...node,
       pressure: newPressure,
       flagged: isFlagged,
-      flaggedAt: isFlagged ? Date.now() : null
+      flaggedAt: isFlagged ? (node.flaggedAt ?? Date.now()) : null,
     };
   }
 

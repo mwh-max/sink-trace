@@ -14,13 +14,20 @@ const KY_BOUNDS = [
   [39.2, -81.9], // Northeast Kentucky
 ];
 
-// Ensures the map reflows correctly when rendered in React
 function InvalidateOnLoad() {
   const map = useMap();
   useEffect(() => {
     map.invalidateSize();
   }, [map]);
   return null;
+}
+
+function isValidCoords(coords) {
+  return (
+    Array.isArray(coords) &&
+    coords.length === 2 &&
+    coords.every((v) => typeof v === "number" && isFinite(v))
+  );
 }
 
 export default function MapView({ nodes }) {
@@ -30,6 +37,8 @@ export default function MapView({ nodes }) {
       zoom={8}
       minZoom={7}
       maxZoom={14}
+      maxBounds={KY_BOUNDS}
+      maxBoundsViscosity={1.0}
       style={{
         height: "min(62vh, 600px)",
         width: "100%",
@@ -46,24 +55,27 @@ export default function MapView({ nodes }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="© OpenStreetMap contributors"
       />
-      {Object.entries(nodes).map(([id, node]) => (
-        <CircleMarker
-          key={id}
-          center={node.coords}
-          radius={8}
-          pathOptions={{
-            color: node.flagged ? "#c0392b" : "#27ae60",
-          }}
-        >
-          <Tooltip>
-            <b>Junction {id}</b>
-            <br />
-            Pressure: {node.pressure} psi
-            <br />
-            Flow: {node.flowDirection}
-          </Tooltip>
-        </CircleMarker>
-      ))}
+      {Object.entries(nodes).map(([id, node]) => {
+        if (!isValidCoords(node.coords)) return null;
+        return (
+          <CircleMarker
+            key={id}
+            center={node.coords}
+            radius={8}
+            pathOptions={{
+              color: node.flagged ? "#c0392b" : "#27ae60",
+            }}
+          >
+            <Tooltip>
+              <b>Junction {id}</b>
+              <br />
+              Pressure: {node.pressure} psi
+              <br />
+              Flow: {node.flowDirection}
+            </Tooltip>
+          </CircleMarker>
+        );
+      })}
     </MapContainer>
   );
 }
