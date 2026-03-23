@@ -1,0 +1,12 @@
+[
+  { "id": "e1",  "from": "treatmentPlant",  "to": "mainJunction",   "lengthMeters": 2800, "diameterMm": 150, "resistanceCoeff": 105 },
+  { "id": "e2",  "from": "mainJunction",    "to": "inez",           "lengthMeters": 1500, "diameterMm": 100, "resistanceCoeff": 110 },
+  { "id": "e3",  "from": "mainJunction",    "to": "dingus",         "lengthMeters": 5100, "diameterMm": 100, "resistanceCoeff": 105 },
+  { "id": "e4",  "from": "mainJunction",    "to": "tugForkJunction","lengthMeters": 7200, "diameterMm": 150, "resistanceCoeff": 100 },
+  { "id": "e5",  "from": "mainJunction",    "to": "boosterStation", "lengthMeters": 3400, "diameterMm": 100, "resistanceCoeff": 110 },
+  { "id": "e6",  "from": "boosterStation",  "to": "pilgrim",        "lengthMeters": 3200, "diameterMm":  75, "resistanceCoeff": 115 },
+  { "id": "e7",  "from": "boosterStation",  "to": "tomahawk",       "lengthMeters": 4800, "diameterMm":  75, "resistanceCoeff": 115 },
+  { "id": "e8",  "from": "boosterStation",  "to": "beauty",         "lengthMeters": 6900, "diameterMm":  75, "resistanceCoeff": 108 },
+  { "id": "e9",  "from": "tugForkJunction", "to": "warfield",       "lengthMeters": 6100, "diameterMm": 100, "resistanceCoeff": 105 },
+  { "id": "e10", "from": "tugForkJunction", "to": "lovely",         "lengthMeters": 9800, "diameterMm":  75, "resistanceCoeff": 100 }
+]

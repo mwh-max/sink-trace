@@ -1,21 +1,18 @@
 import simulateFlow from './simulateFlow.js';
-import { createRng, SESSION_SEED } from './prng.js';
+import pipeEdges from '../data/pipeEdges.json';
 import { NODES_KEY } from './storageKeys.js';
 
 export const MAX_LOG_ENTRIES = 20;
 export const SIMULATE = 'simulate';
 
-// Module-level RNG: initialised once per session from a stored or random seed.
-// Advances its internal state on every call, so consecutive ticks differ.
-let _rng = createRng(SESSION_SEED);
-
-// Testing escape hatch — lets tests inject a seeded RNG for determinism.
-export function _setRngForTesting(rng) {
-  _rng = rng;
+// Testing escape hatch — lets tests inject a minimal edge set for isolation.
+let _edges = pipeEdges;
+export function _setEdgesForTesting(edges) {
+  _edges = edges;
 }
 
 function runSimulationStep(prevNodes) {
-  const updated = simulateFlow(prevNodes, _rng);
+  const updated = simulateFlow({ nodes: prevNodes, edges: _edges });
   const newEntries = Object.entries(updated)
     .filter(([key, node]) => node.flagged && !prevNodes[key]?.flagged)
     .map(([key, node]) => ({

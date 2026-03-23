@@ -30,7 +30,12 @@ function GridMap({ nodes }) {
             }
             style={{ border: `2px solid ${getPressureColor(node.pressure)}` }}
           >
-            <h3>{`Junction ${id}`}</h3>
+            <h3>{node.label ?? `Junction ${id}`}</h3>
+            {node.type && (
+              <p style={{ fontSize: "0.75rem", color: "#888", margin: "0 0 0.3rem" }}>
+                {node.type}
+              </p>
+            )}
             <p>{`Pressure: ${node.pressure} psi`}</p>
             {showTrend && (
               <p style={{ color: TREND_COLOR[trend], fontSize: "0.85rem", margin: "0.2rem 0" }}>

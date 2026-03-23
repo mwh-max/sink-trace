@@ -5,6 +5,9 @@ export const NodeSchema = z.object({
   pressure:      z.number().min(0).max(PRESSURE_MAX),
   flowDirection: z.enum(['normal', 'reversed']),
   coords:        z.tuple([z.number(), z.number()]),
+  // Topology metadata — optional so legacy stored data remains valid
+  type:  z.enum(['source', 'junction', 'endpoint']).optional(),
+  label: z.string().optional(),
   // Runtime-only fields added by simulateFlow — optional on load
   history:   z.array(z.number()).optional(),
   flagged:   z.boolean().optional().default(false),

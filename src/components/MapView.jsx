@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -62,13 +62,24 @@ export default function MapView({ nodes }) {
           <CircleMarker
             key={id}
             center={node.coords}
-            radius={8}
-            pathOptions={{
-              color: node.flagged ? COLOR_CRITICAL : COLOR_SAFE,
-            }}
+            radius={node.type === "source" ? 12 : node.type === "junction" ? 9 : 6}
+            pathOptions={
+              node.type === "source"
+                ? { color: "#2980b9", fillColor: "#2980b9", fillOpacity: 0.9 }
+                : node.type === "junction"
+                ? { color: "#7f8c8d", fillColor: "#7f8c8d", fillOpacity: 0.7 }
+                : { color: node.flagged ? COLOR_CRITICAL : COLOR_SAFE,
+                    fillColor: node.flagged ? COLOR_CRITICAL : COLOR_SAFE,
+                    fillOpacity: 0.85 }
+            }
           >
             <Tooltip>
-              <b>Junction {id}</b>
+              <b>{node.label ?? `Junction ${id}`}</b>
+              {node.type && (
+                <span style={{ display: "block", fontSize: "0.8em", color: "#666" }}>
+                  {node.type}
+                </span>
+              )}
               <br />
               Pressure: {node.pressure} psi
               <br />
