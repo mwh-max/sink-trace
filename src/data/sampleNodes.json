@@ -1,17 +1,17 @@
 {
-  "nodeA": {
-    "pressure": 32,
-    "flowDirection": "normal",
-    "coords": [38.04, -84.5]
-  },
-  "nodeB": {
-    "pressure": 28,
-    "flowDirection": "reversed",
-    "coords": [38.05, -84.49]
-  },
-  "nodeC": {
-    "pressure": 24,
-    "flowDirection": "normal",
-    "coords": [38.06, -84.48]
-  }
+  "louisville":    { "pressure": 58, "flowDirection": "normal",   "coords": [38.25, -85.76] },
+  "lexington":     { "pressure": 52, "flowDirection": "normal",   "coords": [38.05, -84.50] },
+  "bowlingGreen":  { "pressure": 44, "flowDirection": "normal",   "coords": [36.99, -86.44] },
+  "owensboro":     { "pressure": 61, "flowDirection": "normal",   "coords": [37.77, -87.11] },
+  "covington":     { "pressure": 38, "flowDirection": "normal",   "coords": [39.08, -84.51] },
+  "frankfort":     { "pressure": 47, "flowDirection": "normal",   "coords": [38.20, -84.87] },
+  "elizabethtown": { "pressure": 55, "flowDirection": "normal",   "coords": [37.70, -85.86] },
+  "paducah":       { "pressure": 33, "flowDirection": "reversed", "coords": [37.08, -88.60] },
+  "hopkinsville":  { "pressure": 27, "flowDirection": "reversed", "coords": [36.87, -87.49] },
+  "richmond":      { "pressure": 64, "flowDirection": "normal",   "coords": [37.75, -84.29] },
+  "florence":      { "pressure": 41, "flowDirection": "normal",   "coords": [38.99, -84.63] },
+  "henderson":     { "pressure": 70, "flowDirection": "normal",   "coords": [37.84, -87.59] },
+  "madisonville":  { "pressure": 22, "flowDirection": "reversed", "coords": [37.33, -87.50] },
+  "somerset":      { "pressure": 49, "flowDirection": "normal",   "coords": [37.09, -84.60] },
+  "ashland":       { "pressure": 56, "flowDirection": "normal",   "coords": [38.48, -82.64] }
 }

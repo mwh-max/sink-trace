@@ -1,3 +1,6 @@
+# Claude Code IDE config
+.claude/
+
 # Environment variables
 .env
 .env.*

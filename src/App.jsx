@@ -2,14 +2,16 @@ import { useState, useEffect, useMemo, useReducer, useCallback } from "react";
 import GridMap from "./components/GridMap.jsx";
 import MapView from "./components/MapView.jsx";
 import MapErrorBoundary from "./components/MapErrorBoundary.jsx";
-import sampleNodes from "./data/sampleNodes.json";
 import "./App.css";
-import { reducer, MAX_LOG_ENTRIES } from "./utils/appReducer.js";
+import { reducer, MAX_LOG_ENTRIES, SESSION_SEED } from "./utils/appReducer.js";
 import { COLOR_SAFE, COLOR_CRITICAL } from "./utils/colors.js";
+import { useNodes } from "./hooks/useNodes.js";
 
 export default function App() {
+  const { nodes: initialNodes } = useNodes();
+
   const [{ nodes, logEntries }, dispatch] = useReducer(reducer, {
-    nodes: sampleNodes,
+    nodes: initialNodes,
     logEntries: [],
   });
   const [view, setView] = useState("grid");
@@ -86,6 +88,11 @@ export default function App() {
           ))}
         </ul>
       </div>
+
+      <p style={{ marginTop: "2rem", fontSize: "0.75rem", color: "#aaa" }}>
+        Simulation seed: {SESSION_SEED} — set{" "}
+        <code>localStorage["sinktrace-seed"]</code> to replay a scenario
+      </p>
     </div>
   );
 }
