@@ -1,5 +1,5 @@
 import { beforeEach, describe, it, expect } from 'vitest';
-import { reducer, MAX_LOG_ENTRIES, _setRngForTesting } from './appReducer.js';
+import { reducer, MAX_LOG_ENTRIES, SIMULATE, _setRngForTesting } from './appReducer.js';
 import { createRng } from './prng.js';
 
 // pressure=20 → all outcomes (17–22) are < 30, so always flagged
@@ -26,7 +26,7 @@ beforeEach(() => {
 describe('reducer – simulate action', () => {
   it('adds a log entry when a node becomes newly flagged', () => {
     const state = baseState({ pressure: 20 });
-    const next = reducer(state, { type: 'simulate' });
+    const next = reducer(state, { type: SIMULATE });
     expect(next.logEntries).toHaveLength(1);
     expect(next.logEntries[0].id).toBe('a');
     expect(next.logEntries[0]).toHaveProperty('pressure');
@@ -39,20 +39,20 @@ describe('reducer – simulate action', () => {
       nodes: { a: node({ pressure: 20, flagged: true, flaggedAt: ts }) },
       logEntries: [{ id: 'a', pressure: 20, flaggedAt: ts }],
     };
-    const next = reducer(state, { type: 'simulate' });
+    const next = reducer(state, { type: SIMULATE });
     expect(next.logEntries).toHaveLength(1);
   });
 
   it('does not add a log entry when pressure stays safe', () => {
     const state = baseState({ pressure: 50 });
-    const next = reducer(state, { type: 'simulate' });
+    const next = reducer(state, { type: SIMULATE });
     expect(next.logEntries).toHaveLength(0);
   });
 
   it('prepends new entries so the latest appears first', () => {
     const oldEntry = { id: 'old', pressure: 20, flaggedAt: Date.now() - 10_000 };
     const state = { nodes: { a: node({ pressure: 20 }) }, logEntries: [oldEntry] };
-    const next = reducer(state, { type: 'simulate' });
+    const next = reducer(state, { type: SIMULATE });
     expect(next.logEntries[0].id).toBe('a');
     expect(next.logEntries[1]).toBe(oldEntry);
   });
@@ -62,7 +62,7 @@ describe('reducer – simulate action', () => {
       id: `old${i}`, pressure: 20, flaggedAt: Date.now() - i * 1000,
     }));
     const state = { nodes: { a: node({ pressure: 20 }) }, logEntries: fullLog };
-    const next = reducer(state, { type: 'simulate' });
+    const next = reducer(state, { type: SIMULATE });
     expect(next.logEntries.length).toBeLessThanOrEqual(MAX_LOG_ENTRIES);
   });
 
@@ -73,13 +73,13 @@ describe('reducer – simulate action', () => {
 
   it('always produces updated nodes', () => {
     const state = baseState({ pressure: 50 });
-    const next = reducer(state, { type: 'simulate' });
+    const next = reducer(state, { type: SIMULATE });
     expect(next.nodes).not.toBe(state.nodes);
   });
 
   it('advances history on each tick', () => {
     const state = baseState({ pressure: 50, history: [50] });
-    const next = reducer(state, { type: 'simulate' });
+    const next = reducer(state, { type: SIMULATE });
     expect(next.nodes.a.history.length).toBeGreaterThan(1);
     expect(next.nodes.a.history.at(-1)).toBe(next.nodes.a.pressure);
   });

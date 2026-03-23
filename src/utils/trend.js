@@ -1,3 +1,5 @@
+import { COLOR_SAFE, COLOR_CRITICAL } from './colors.js';
+
 // Classifies recent pressure direction based on the last 3 readings.
 // Requires at least 3 data points; returns 'stable' otherwise.
 export function getTrend(history) {
@@ -15,7 +17,7 @@ export const TREND_LABEL = {
 };
 
 export const TREND_COLOR = {
-  falling: '#c0392b',
-  rising:  '#27ae60',
+  falling: COLOR_CRITICAL,
+  rising:  COLOR_SAFE,
   stable:  '#7f8c8d',
 };

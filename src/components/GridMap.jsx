@@ -3,7 +3,7 @@ import "./grid.css";
 import { getPressureColor } from "../utils/colors.js";
 import { getTrend, TREND_LABEL, TREND_COLOR } from "../utils/trend.js";
 
-export default function GridMap({ nodes }) {
+function GridMap({ nodes }) {
   if (!nodes || Object.keys(nodes).length === 0) {
     return <div style={{ padding: "2rem" }}>No junction data found.</div>;
   }
@@ -12,7 +12,9 @@ export default function GridMap({ nodes }) {
     <div className="grid-container">
       {Object.entries(nodes).map(([id, node]) => {
         const trend = getTrend(node.history);
-        const showTrend = node.history && node.history.length >= 3;
+        // getTrend returns 'stable' for < 3 readings; only show badge once
+        // we have enough data for a meaningful direction.
+        const showTrend = trend !== 'stable' || (node.history?.length ?? 0) >= 3;
 
         return (
           <div
@@ -51,3 +53,5 @@ export default function GridMap({ nodes }) {
     </div>
   );
 }
+
+export default React.memo(GridMap);

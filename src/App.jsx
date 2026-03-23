@@ -3,8 +3,10 @@ import GridMap from "./components/GridMap.jsx";
 import MapView from "./components/MapView.jsx";
 import MapErrorBoundary from "./components/MapErrorBoundary.jsx";
 import "./App.css";
-import { reducer, MAX_LOG_ENTRIES, SESSION_SEED } from "./utils/appReducer.js";
+import { reducer, SIMULATE } from "./utils/appReducer.js";
 import { COLOR_SAFE, COLOR_CRITICAL } from "./utils/colors.js";
+import { SESSION_SEED } from "./utils/prng.js";
+import { SEED_KEY } from "./utils/storageKeys.js";
 import { useNodes } from "./hooks/useNodes.js";
 
 export default function App() {
@@ -16,7 +18,7 @@ export default function App() {
   });
   const [view, setView] = useState("grid");
 
-  const applySimulation = useCallback(() => dispatch({ type: "simulate" }), []);
+  const applySimulation = useCallback(() => dispatch({ type: SIMULATE }), []);
 
   useEffect(() => {
     const interval = setInterval(applySimulation, 3000);
@@ -91,7 +93,7 @@ export default function App() {
 
       <p style={{ marginTop: "2rem", fontSize: "0.75rem", color: "#aaa" }}>
         Simulation seed: {SESSION_SEED} — set{" "}
-        <code>localStorage["sinktrace-seed"]</code> to replay a scenario
+        <code>localStorage["{SEED_KEY}"]</code> to replay a scenario
       </p>
     </div>
   );

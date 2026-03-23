@@ -1,3 +1,5 @@
+import { SEED_KEY } from './storageKeys.js';
+
 // Mulberry32 — fast, seedable pseudo-random number generator.
 // Returns a function that behaves like Math.random() but is deterministic
 // given the same seed, enabling reproducible simulation replays.
@@ -13,9 +15,12 @@ export function createRng(seed) {
 
 export function loadSeed() {
   try {
-    const stored = localStorage.getItem('sinktrace-seed');
+    const stored = localStorage.getItem(SEED_KEY);
     return stored ? parseInt(stored, 10) : Date.now();
   } catch {
     return Date.now();
   }
 }
+
+// Initialised once per session; import this wherever the seed value is needed.
+export const SESSION_SEED = loadSeed();
