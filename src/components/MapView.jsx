@@ -8,6 +8,7 @@ import {
   ZoomControl,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { COLOR_SAFE, COLOR_CRITICAL } from "../utils/colors.js";
 
 const KY_BOUNDS = [
   [36.5, -89.6], // Southwest Kentucky
@@ -55,15 +56,15 @@ export default function MapView({ nodes }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="© OpenStreetMap contributors"
       />
-      {Object.entries(nodes).map(([id, node]) => {
-        if (!isValidCoords(node.coords)) return null;
-        return (
+      {Object.entries(nodes)
+        .filter(([, node]) => isValidCoords(node.coords))
+        .map(([id, node]) => (
           <CircleMarker
             key={id}
             center={node.coords}
             radius={8}
             pathOptions={{
-              color: node.flagged ? "#c0392b" : "#27ae60",
+              color: node.flagged ? COLOR_CRITICAL : COLOR_SAFE,
             }}
           >
             <Tooltip>
@@ -74,8 +75,7 @@ export default function MapView({ nodes }) {
               Flow: {node.flowDirection}
             </Tooltip>
           </CircleMarker>
-        );
-      })}
+        ))}
     </MapContainer>
   );
 }

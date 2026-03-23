@@ -1,16 +1,11 @@
 import React from "react";
 import "./grid.css";
+import { getPressureColor } from "../utils/colors.js";
 
 export default function GridMap({ nodes }) {
   if (!nodes || Object.keys(nodes).length === 0) {
     return <div style={{ padding: "2rem" }}>No junction data found.</div>;
   }
-
-  const getPressureColor = (psi) => {
-    if (psi >= 30) return "#27ae60";
-    if (psi >= 25) return "#f39c12";
-    return "#c0392b";
-  };
 
   return (
     <div className="grid-container">
@@ -24,7 +19,7 @@ export default function GridMap({ nodes }) {
               : `Junction ${id} — Pressure: ${node.pressure} psi`
           }
           style={{
-            border: `2px solid ${getPressureColor(node.pressure)}`
+            border: `2px solid ${getPressureColor(node.pressure)}`,
           }}
         >
           <h3>{`Junction ${id}`}</h3>
@@ -35,7 +30,7 @@ export default function GridMap({ nodes }) {
               : "Flow: ➡️ Normal"}
           </p>
           {node.flagged && (
-            <p style={{ color: "#c0392b", fontWeight: "bold" }}>
+            <p style={{ color: getPressureColor(node.pressure), fontWeight: "bold" }}>
               ⚠️ Pressure below safe minimum
             </p>
           )}

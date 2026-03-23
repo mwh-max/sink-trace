@@ -1,4 +1,5 @@
 import React from "react";
+import { COLOR_CRITICAL } from "../utils/colors.js";
 
 export default class MapErrorBoundary extends React.Component {
   constructor(props) {
@@ -13,7 +14,7 @@ export default class MapErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: "2rem", color: "#c0392b" }}>
+        <div style={{ padding: "2rem", color: COLOR_CRITICAL }}>
           Map failed to load. Please refresh to try again.
         </div>
       );
