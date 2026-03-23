@@ -4,4 +4,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/sink-trace/',
   plugins: [react()],
+  build: {
+    sourcemap: false,
+  },
+  esbuild: {
+    drop: ['console'],
+  },
 })
