@@ -1,6 +1,9 @@
 export const PRESSURE_MIN = 30;
 export const PRESSURE_MAX = 120;
 export const HISTORY_MAX  = 10;
+// Number of consecutive below-threshold ticks required before a node is flagged.
+// Prevents false positives from transient pressure dips.
+export const CONSECUTIVE_TICKS_THRESHOLD = 3;
 
 // Darcy-Weisbach constants — fixed for a single-velocity simplified model.
 // Adjust FLOW_VELOCITY or FRICTION_FACTOR to re-calibrate drop magnitudes.
@@ -15,10 +18,12 @@ function darcyWeisbachDrop(edge) {
   return FRICTION_FACTOR * (L / D) * (WATER_DENSITY * FLOW_VELOCITY ** 2 / 2) * PA_TO_PSI;
 }
 
-// Takes a topology { nodes, edges } and returns an updated nodes map.
+// Takes a topology { nodes, edges, consecutiveTicks } and returns an updated nodes map.
 // Pressure at each node is computed by BFS propagation from source nodes.
 // When multiple paths reach a node, the highest pressure wins (most favourable feed).
-export default function simulateFlow({ nodes, edges }) {
+// A node is only flagged after its pressure has been below PRESSURE_MIN for
+// consecutiveTicks ticks in a row; the counter resets on any tick above the threshold.
+export default function simulateFlow({ nodes, edges, consecutiveTicks = CONSECUTIVE_TICKS_THRESHOLD }) {
   // Build outgoing-edge map so BFS can walk the graph efficiently.
   const outEdges = Object.fromEntries(Object.keys(nodes).map(k => [k, []]));
   for (const edge of edges) {
@@ -67,13 +72,19 @@ export default function simulateFlow({ nodes, edges }) {
     // Nodes unreachable from any source keep their stored pressure.
     const raw      = computedPressure[id] ?? node.pressure;
     const pressure = Math.min(Math.max(Math.round(raw * 10) / 10, 0), PRESSURE_MAX);
-    const isFlagged = pressure < PRESSURE_MIN;
-    const history   = node.history ?? [node.pressure];
+
+    const isPressureLow       = pressure < PRESSURE_MIN;
+    const prevCounter         = node.consecutiveLowTicks ?? 0;
+    const consecutiveLowTicks = isPressureLow ? prevCounter + 1 : 0;
+    const isFlagged           = consecutiveLowTicks >= consecutiveTicks;
+
+    const history = node.history ?? [node.pressure];
 
     updated[id] = {
       ...node,
       pressure,
-      flowDirection: reversedNodes.has(id) ? 'reversed' : 'normal',
+      flowDirection:      reversedNodes.has(id) ? 'reversed' : 'normal',
+      consecutiveLowTicks,
       flagged:   isFlagged,
       flaggedAt: isFlagged ? (node.flaggedAt ?? now) : null,
       history:   [...history.slice(-(HISTORY_MAX - 1)), pressure],

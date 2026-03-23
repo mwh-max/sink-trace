@@ -33,9 +33,9 @@ beforeEach(() => {
 
 describe('reducer – simulate action', () => {
   it('adds a log entry when a node becomes newly flagged', () => {
-    // src=34 → a ≈ 28.6 psi → flagged
+    // src=34 → a ≈ 28.6 psi; consecutiveTicks=1 so one tick is enough to flag
     const state = baseState(34);
-    const next = reducer(state, { type: SIMULATE });
+    const next = reducer(state, { type: SIMULATE, consecutiveTicks: 1 });
     expect(next.logEntries).toHaveLength(1);
     expect(next.logEntries[0].id).toBe('a');
     expect(next.logEntries[0]).toHaveProperty('pressure');
@@ -47,16 +47,16 @@ describe('reducer – simulate action', () => {
     const state = {
       nodes: {
         src: sourceNode(34),
-        a:   node({ flagged: true, flaggedAt: ts }),
+        a:   node({ flagged: true, flaggedAt: ts, consecutiveLowTicks: 1 }),
       },
       logEntries: [{ id: 'a', pressure: 28, flaggedAt: ts }],
     };
-    const next = reducer(state, { type: SIMULATE });
+    const next = reducer(state, { type: SIMULATE, consecutiveTicks: 1 });
     expect(next.logEntries).toHaveLength(1);
   });
 
   it('does not add a log entry when pressure stays safe', () => {
-    // src=50 → a ≈ 44.6 psi → safe
+    // src=50 → a ≈ 44.6 psi → safe regardless of threshold
     const state = baseState(50);
     const next = reducer(state, { type: SIMULATE });
     expect(next.logEntries).toHaveLength(0);
@@ -65,7 +65,7 @@ describe('reducer – simulate action', () => {
   it('prepends new entries so the latest appears first', () => {
     const oldEntry = { id: 'old', pressure: 20, flaggedAt: Date.now() - 10_000 };
     const state = { nodes: { src: sourceNode(34), a: node() }, logEntries: [oldEntry] };
-    const next = reducer(state, { type: SIMULATE });
+    const next = reducer(state, { type: SIMULATE, consecutiveTicks: 1 });
     expect(next.logEntries[0].id).toBe('a');
     expect(next.logEntries[1]).toBe(oldEntry);
   });
@@ -75,7 +75,7 @@ describe('reducer – simulate action', () => {
       id: `old${i}`, pressure: 20, flaggedAt: Date.now() - i * 1000,
     }));
     const state = { nodes: { src: sourceNode(34), a: node() }, logEntries: fullLog };
-    const next = reducer(state, { type: SIMULATE });
+    const next = reducer(state, { type: SIMULATE, consecutiveTicks: 1 });
     expect(next.logEntries.length).toBeLessThanOrEqual(MAX_LOG_ENTRIES);
   });
 

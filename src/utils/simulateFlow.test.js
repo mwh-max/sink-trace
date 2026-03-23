@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import simulateFlow, { PRESSURE_MIN, HISTORY_MAX } from './simulateFlow.js';
+import simulateFlow, { PRESSURE_MIN, HISTORY_MAX, CONSECUTIVE_TICKS_THRESHOLD } from './simulateFlow.js';
 
 // Shared test edge: 1500 m, 100 mm diameter.
 // ΔP = 0.02 × (1500/0.1) × (998 × 0.5²/2) × 0.000145038 ≈ 5.43 psi
@@ -76,13 +76,16 @@ describe('simulateFlow – BFS propagation', () => {
 });
 
 describe('simulateFlow – flagging', () => {
+  // Pass consecutiveTicks: 1 so a single below-threshold tick triggers flagging.
+  // Counter-specific behaviour is tested in the consecutive ticks suite below.
+
   it('flags a node and sets flaggedAt when pressure drops below 30 psi', () => {
-    // source=34 → downstream ≈ 34 − 5.43 = 28.6 psi → flagged
+    // source=34 → downstream ≈ 34 − 5.43 = 28.6 psi → below threshold
     const topology = {
       nodes: { src: sourceNode(34), a: junctionNode() },
       edges: [edge('src', 'a')],
     };
-    const result = simulateFlow(topology);
+    const result = simulateFlow({ ...topology, consecutiveTicks: 1 });
     expect(result.a.pressure).toBeLessThan(PRESSURE_MIN);
     expect(result.a.flagged).toBe(true);
     expect(result.a.flaggedAt).toBeTypeOf('number');
@@ -94,7 +97,7 @@ describe('simulateFlow – flagging', () => {
       nodes: { src: sourceNode(50), a: junctionNode() },
       edges: [edge('src', 'a')],
     };
-    const result = simulateFlow(topology);
+    const result = simulateFlow({ ...topology, consecutiveTicks: 1 });
     expect(result.a.pressure).toBeGreaterThanOrEqual(PRESSURE_MIN);
     expect(result.a.flagged).toBe(false);
     expect(result.a.flaggedAt).toBeNull();
@@ -105,11 +108,11 @@ describe('simulateFlow – flagging', () => {
     const topology = {
       nodes: {
         src: sourceNode(34),
-        a:   junctionNode(20, { flagged: true, flaggedAt: original }),
+        a:   junctionNode(20, { flagged: true, flaggedAt: original, consecutiveLowTicks: 1 }),
       },
       edges: [edge('src', 'a')],
     };
-    const result = simulateFlow(topology);
+    const result = simulateFlow({ ...topology, consecutiveTicks: 1 });
     expect(result.a.flagged).toBe(true);
     expect(result.a.flaggedAt).toBe(original);
   });
@@ -118,17 +121,16 @@ describe('simulateFlow – flagging', () => {
     const topology = {
       nodes: {
         src: sourceNode(50),
-        a:   junctionNode(20, { flagged: true, flaggedAt: 12345 }),
+        a:   junctionNode(20, { flagged: true, flaggedAt: 12345, consecutiveLowTicks: 3 }),
       },
       edges: [edge('src', 'a')],
     };
-    const result = simulateFlow(topology);
+    const result = simulateFlow({ ...topology, consecutiveTicks: 1 });
     expect(result.a.flagged).toBe(false);
     expect(result.a.flaggedAt).toBeNull();
   });
 
   it('never produces pressure below 0', () => {
-    // Long, narrow pipe — drop exceeds source pressure
     const topology = {
       nodes: { src: sourceNode(5), a: junctionNode() },
       edges: [edge('src', 'a', { lengthMeters: 50000, diameterMm: 25 })],
@@ -138,12 +140,63 @@ describe('simulateFlow – flagging', () => {
   });
 
   it('never produces pressure above PRESSURE_MAX', () => {
-    const topology = {
-      nodes: { src: sourceNode(120) },
-      edges: [],
-    };
+    const topology = { nodes: { src: sourceNode(120) }, edges: [] };
     const result = simulateFlow(topology);
     expect(result.src.pressure).toBeLessThanOrEqual(120);
+  });
+});
+
+describe('simulateFlow – consecutive ticks', () => {
+  // source=34 → downstream ≈ 28.6 psi (below threshold every tick)
+  const lowTopology = {
+    nodes: { src: sourceNode(34), a: junctionNode() },
+    edges: [edge('src', 'a')],
+  };
+
+  it('does not flag before the threshold is reached', () => {
+    // After 1 tick with N=3, counter=1 → not yet flagged
+    const result = simulateFlow({ ...lowTopology, consecutiveTicks: 3 });
+    expect(result.a.consecutiveLowTicks).toBe(1);
+    expect(result.a.flagged).toBe(false);
+  });
+
+  it('flags exactly when the counter reaches N', () => {
+    // Simulate N ticks by feeding each result back as input
+    let state = lowTopology.nodes;
+    for (let i = 0; i < CONSECUTIVE_TICKS_THRESHOLD; i++) {
+      state = simulateFlow({ nodes: state, edges: lowTopology.edges, consecutiveTicks: CONSECUTIVE_TICKS_THRESHOLD });
+    }
+    expect(state.a.consecutiveLowTicks).toBe(CONSECUTIVE_TICKS_THRESHOLD);
+    expect(state.a.flagged).toBe(true);
+    expect(state.a.flaggedAt).toBeTypeOf('number');
+  });
+
+  it('increments the counter each below-threshold tick', () => {
+    let state = lowTopology.nodes;
+    for (let i = 1; i <= 3; i++) {
+      state = simulateFlow({ nodes: state, edges: lowTopology.edges, consecutiveTicks: 10 });
+      expect(state.a.consecutiveLowTicks).toBe(i);
+    }
+  });
+
+  it('resets the counter to 0 when pressure recovers', () => {
+    // Run two low ticks, then one safe tick
+    const safeTopology = { nodes: lowTopology.nodes, edges: [edge('src', 'a')], consecutiveTicks: 10 };
+    let state = simulateFlow(safeTopology);
+    state = simulateFlow({ ...safeTopology, nodes: state });
+    expect(state.a.consecutiveLowTicks).toBe(2);
+
+    // Now switch to a safe source
+    const recoveredNodes = { ...state, src: sourceNode(80) };
+    const recovered = simulateFlow({ nodes: recoveredNodes, edges: lowTopology.edges, consecutiveTicks: 10 });
+    expect(recovered.a.consecutiveLowTicks).toBe(0);
+    expect(recovered.a.flagged).toBe(false);
+    expect(recovered.a.flaggedAt).toBeNull();
+  });
+
+  it('exports CONSECUTIVE_TICKS_THRESHOLD as a positive integer', () => {
+    expect(Number.isInteger(CONSECUTIVE_TICKS_THRESHOLD)).toBe(true);
+    expect(CONSECUTIVE_TICKS_THRESHOLD).toBeGreaterThan(0);
   });
 });
 

@@ -17,8 +17,12 @@ export default function App() {
     logEntries: [],
   });
   const [view, setView] = useState("grid");
+  const [flagThreshold, setFlagThreshold] = useState(3);
 
-  const applySimulation = useCallback(() => dispatch({ type: SIMULATE }), []);
+  const applySimulation = useCallback(
+    () => dispatch({ type: SIMULATE, consecutiveTicks: flagThreshold }),
+    [flagThreshold]
+  );
 
   useEffect(() => {
     const interval = setInterval(applySimulation, 3000);
@@ -62,6 +66,19 @@ export default function App() {
       >
         {view === "grid" ? "Show Map View" : "Show Grid View"}
       </button>
+
+      <label style={{ marginLeft: "1.5rem", fontSize: "0.9rem" }}>
+        Flag after{" "}
+        <input
+          type="number"
+          min={1}
+          max={20}
+          value={flagThreshold}
+          onChange={(e) => setFlagThreshold(Math.max(1, Number(e.target.value)))}
+          style={{ width: "3rem", textAlign: "center" }}
+        />{" "}
+        consecutive low-pressure ticks
+      </label>
 
       <p style={{ marginTop: "1rem", color: hasFlagged ? COLOR_CRITICAL : COLOR_SAFE }}>
         {hasFlagged

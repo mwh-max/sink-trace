@@ -1,4 +1,4 @@
-import simulateFlow from './simulateFlow.js';
+import simulateFlow, { CONSECUTIVE_TICKS_THRESHOLD } from './simulateFlow.js';
 import pipeEdges from '../data/pipeEdges.json';
 import { NODES_KEY } from './storageKeys.js';
 
@@ -11,8 +11,8 @@ export function _setEdgesForTesting(edges) {
   _edges = edges;
 }
 
-function runSimulationStep(prevNodes) {
-  const updated = simulateFlow({ nodes: prevNodes, edges: _edges });
+function runSimulationStep(prevNodes, consecutiveTicks) {
+  const updated = simulateFlow({ nodes: prevNodes, edges: _edges, consecutiveTicks });
   const newEntries = Object.entries(updated)
     .filter(([key, node]) => node.flagged && !prevNodes[key]?.flagged)
     .map(([key, node]) => ({
@@ -29,7 +29,10 @@ let _lastSerialized = null;
 
 export function reducer(state, action) {
   if (action.type === SIMULATE) {
-    const { updated, newEntries } = runSimulationStep(state.nodes);
+    const { updated, newEntries } = runSimulationStep(
+      state.nodes,
+      action.consecutiveTicks ?? CONSECUTIVE_TICKS_THRESHOLD
+    );
     const serialized = JSON.stringify(updated);
     if (serialized !== _lastSerialized) {
       try {
