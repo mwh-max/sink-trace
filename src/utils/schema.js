@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PRESSURE_MAX } from './simulateFlow.js';
+import { PRESSURE_MAX } from './constants.js';
 
 export const NodeSchema = z.object({
   pressure:      z.number().min(0).max(PRESSURE_MAX),

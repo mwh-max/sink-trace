@@ -1,9 +1,7 @@
-export const PRESSURE_MIN = 30;
-export const PRESSURE_MAX = 120;
-export const HISTORY_MAX  = 10;
-// Number of consecutive below-threshold ticks required before a node is flagged.
-// Prevents false positives from transient pressure dips.
-export const CONSECUTIVE_TICKS_THRESHOLD = 3;
+import { PRESSURE_MIN, PRESSURE_MAX, HISTORY_MAX, CONSECUTIVE_TICKS_THRESHOLD } from './constants.js';
+
+// Re-export so existing consumers (tests, App.jsx) can keep their imports.
+export { PRESSURE_MIN, PRESSURE_MAX, HISTORY_MAX, CONSECUTIVE_TICKS_THRESHOLD };
 
 // Darcy-Weisbach constants — fixed for a single-velocity simplified model.
 // Adjust FLOW_VELOCITY or FRICTION_FACTOR to re-calibrate drop magnitudes.

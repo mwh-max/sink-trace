@@ -3,8 +3,9 @@ import GridMap from "./components/GridMap.jsx";
 import MapView from "./components/MapView.jsx";
 import MapErrorBoundary from "./components/MapErrorBoundary.jsx";
 import "./App.css";
-import { MAX_LOG_ENTRIES } from "./utils/appReducer.js";
 import { COLOR_SAFE, COLOR_CRITICAL } from "./utils/colors.js";
+
+const MAX_LOG_ENTRIES = 20;
 import { CONSECUTIVE_TICKS_THRESHOLD } from "./utils/simulateFlow.js";
 import { useNodeData } from "./hooks/useNodeData.js";
 

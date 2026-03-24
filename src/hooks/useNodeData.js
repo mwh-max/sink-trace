@@ -3,6 +3,7 @@ import { useNodes } from './useNodes.js';
 import simulateFlow, { CONSECUTIVE_TICKS_THRESHOLD } from '../utils/simulateFlow.js';
 import pipeEdges from '../data/pipeEdges.json';
 import { validateNodes } from '../utils/schema.js';
+import { NODES_KEY } from '../utils/storageKeys.js';
 
 const SIMULATE_INTERVAL_MS = 3000;
 const LIVE_POLL_INTERVAL_MS = 5000;
@@ -19,13 +20,16 @@ const API_URL = '/api/nodes';
 export function useNodeData(mode, { flagThreshold = CONSECUTIVE_TICKS_THRESHOLD } = {}) {
   const { nodes: initialNodes } = useNodes();
 
-  const [nodes, setNodes]           = useState(initialNodes);
-  const [error, setError]           = useState(null);
+  const [nodes, setNodes]             = useState(initialNodes);
+  const [error, setError]             = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
   // Keeps the interval callback reading current node state without
   // rebuilding the interval every render.
   const nodesRef = useRef(initialNodes);
+
+  // Tracks the last serialized node state to avoid redundant localStorage writes.
+  const lastSerializedRef = useRef(null);
 
   // Always holds the current mode's immediate-update function so that
   // the returned tick() reference stays stable across renders.
@@ -41,10 +45,22 @@ export function useNodeData(mode, { flagThreshold = CONSECUTIVE_TICKS_THRESHOLD 
 
   useEffect(() => {
     if (mode === 'simulate') {
-      const runTick = () =>
-        applyNodes(
-          simulateFlow({ nodes: nodesRef.current, edges: pipeEdges, consecutiveTicks: flagThreshold })
-        );
+      const runTick = () => {
+        const updated = simulateFlow({
+          nodes: nodesRef.current,
+          edges: pipeEdges,
+          consecutiveTicks: flagThreshold,
+        });
+        // Persist to localStorage only when state has actually changed.
+        const serialized = JSON.stringify(updated);
+        if (serialized !== lastSerializedRef.current) {
+          try {
+            localStorage.setItem(NODES_KEY, serialized);
+            lastSerializedRef.current = serialized;
+          } catch { /* storage quota exceeded or unavailable */ }
+        }
+        applyNodes(updated);
+      };
 
       tickRef.current = runTick;
       runTick(); // apply computed state immediately on mount / mode change
