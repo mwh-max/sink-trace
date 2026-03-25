@@ -6,8 +6,9 @@ export const NodeSchema = z.object({
   flowDirection: z.enum(['normal', 'reversed']),
   coords:        z.tuple([z.number(), z.number()]),
   // Topology metadata — optional so legacy stored data remains valid
-  type:  z.enum(['source', 'junction', 'endpoint']).optional(),
-  label: z.string().optional(),
+  type:      z.enum(['source', 'junction', 'endpoint']).optional(),
+  label:     z.string().optional(),
+  pressureMin: z.number().positive().optional(),
   // Runtime-only fields added by simulateFlow — optional on load
   consecutiveLowTicks: z.number().int().min(0).optional().default(0),
   history:   z.array(z.number()).optional(),

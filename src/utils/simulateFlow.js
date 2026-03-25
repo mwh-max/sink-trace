@@ -71,7 +71,8 @@ export default function simulateFlow({ nodes, edges, consecutiveTicks = CONSECUT
     const raw      = computedPressure[id] ?? node.pressure;
     const pressure = Math.min(Math.max(Math.round(raw * 10) / 10, 0), PRESSURE_MAX);
 
-    const isPressureLow       = pressure < PRESSURE_MIN;
+    const threshold           = node.pressureMin ?? PRESSURE_MIN;
+    const isPressureLow       = pressure < threshold;
     const prevCounter         = node.consecutiveLowTicks ?? 0;
     const consecutiveLowTicks = isPressureLow ? prevCounter + 1 : 0;
     const isFlagged           = consecutiveLowTicks >= consecutiveTicks;
