@@ -1,13 +1,13 @@
 {
-  "treatmentPlant": { "type": "source",   "label": "Martin County Water Treatment Plant", "pressure": 72, "flowDirection": "normal", "coords": [37.8750, -82.5650] },
-  "mainJunction":   { "type": "junction", "label": "Inez Main Distribution Junction",     "pressure": 64, "flowDirection": "normal", "coords": [37.8639, -82.5371] },
-  "boosterStation": { "type": "junction", "label": "Upper Hollow Booster Station",        "pressure": 68, "flowDirection": "normal", "coords": [37.8300, -82.5800] },
-  "tugForkJunction":{ "type": "junction", "label": "Tug Fork Trunk Junction",             "pressure": 54, "flowDirection": "normal", "coords": [37.8500, -82.4700] },
-  "inez":           { "type": "endpoint", "label": "Inez (County Seat)",                  "pressure": 59, "flowDirection": "normal", "coords": [37.8639, -82.5200] },
-  "dingus":         { "type": "endpoint", "label": "Dingus Community",                    "pressure": 49, "flowDirection": "normal", "coords": [37.9100, -82.5650] },
-  "pilgrim":        { "type": "endpoint", "label": "Pilgrim Community",                   "pressure": 55, "flowDirection": "normal", "coords": [37.8150, -82.5950] },
-  "tomahawk":       { "type": "endpoint", "label": "Tomahawk Community",                  "pressure": 50, "flowDirection": "normal", "coords": [37.7850, -82.5700] },
-  "beauty":         { "type": "endpoint", "label": "Beauty Community",                    "pressure": 42, "flowDirection": "normal", "coords": [37.7556, -82.5167] },
-  "warfield":       { "type": "endpoint", "label": "Warfield",                            "pressure": 47, "flowDirection": "normal", "coords": [37.8417, -82.4114] },
-  "lovely":         { "type": "endpoint", "label": "Lovely",                              "pressure": 33, "flowDirection": "normal", "coords": [37.7833, -82.3994] }
+  "treatmentPlant": { "type": "source",   "label": "Martin County Water Treatment Plant", "pressure": 72,   "flowDirection": "normal", "coords": [37.8750, -82.5650] },
+  "mainJunction":   { "type": "junction", "label": "Inez Main Distribution Junction",     "pressure": 66,   "flowDirection": "normal", "coords": [37.8639, -82.5371] },
+  "boosterStation": { "type": "junction", "label": "Upper Hollow Booster Station",        "pressure": 68,   "flowDirection": "normal", "coords": [37.8300, -82.5800], "boostPressure": 14 },
+  "tugForkJunction":{ "type": "junction", "label": "Tug Fork Trunk Junction",             "pressure": 48,   "flowDirection": "normal", "coords": [37.8500, -82.4700] },
+  "inez":           { "type": "endpoint", "label": "Inez (County Seat)",                  "pressure": 61,   "flowDirection": "normal", "coords": [37.8639, -82.5200] },
+  "dingus":         { "type": "endpoint", "label": "Dingus Community",                    "pressure": 48,   "flowDirection": "normal", "coords": [37.9100, -82.5650] },
+  "pilgrim":        { "type": "endpoint", "label": "Pilgrim Community",                   "pressure": 55,   "flowDirection": "normal", "coords": [37.8150, -82.5950] },
+  "tomahawk":       { "type": "endpoint", "label": "Tomahawk Community",                  "pressure": 48,   "flowDirection": "normal", "coords": [37.7850, -82.5700] },
+  "beauty":         { "type": "endpoint", "label": "Beauty Community",                    "pressure": 38,   "flowDirection": "normal", "coords": [37.7556, -82.5167] },
+  "warfield":       { "type": "endpoint", "label": "Warfield",                            "pressure": 27,   "flowDirection": "normal", "coords": [37.8417, -82.4114] },
+  "lovely":         { "type": "endpoint", "label": "Lovely",                              "pressure": 1,    "flowDirection": "normal", "coords": [37.7833, -82.3994] }
 }

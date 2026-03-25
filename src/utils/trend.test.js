@@ -22,7 +22,16 @@ describe('getTrend', () => {
   it('returns stable for a flat or mixed pattern', () => {
     expect(getTrend([50, 50, 50])).toBe('stable');
     expect(getTrend([50, 40, 50])).toBe('stable');
-    expect(getTrend([40, 50, 45])).toBe('stable');
+    expect(getTrend([40, 50, 45])).toBe('stable'); // up then down, net positive but volatile
+  });
+
+  it('detects falling when newest is below both priors (partial drop)', () => {
+    expect(getTrend([50, 50, 49])).toBe('falling'); // plateau then step down
+    expect(getTrend([50, 48, 47])).toBe('falling'); // gradual decline
+  });
+
+  it('detects rising when newest is above both priors (partial rise)', () => {
+    expect(getTrend([40, 40, 41])).toBe('rising'); // plateau then step up
   });
 
   it('uses only the last 3 values regardless of history length', () => {

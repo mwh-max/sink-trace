@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import GridMap from "./components/GridMap.jsx";
 import MapView from "./components/MapView.jsx";
 import MapErrorBoundary from "./components/MapErrorBoundary.jsx";
@@ -7,6 +7,7 @@ import { COLOR_SAFE, COLOR_CRITICAL } from "./utils/colors.js";
 
 import { CONSECUTIVE_TICKS_THRESHOLD } from "./utils/simulateFlow.js";
 import { useNodeData } from "./hooks/useNodeData.js";
+import { useAlerts } from "./hooks/useAlerts.js";
 
 const MAX_LOG_ENTRIES = 20;
 
@@ -19,16 +20,12 @@ export default function App() {
 
   // Accumulate a log of nodes that become newly flagged, across both modes.
   const [logEntries, setLogEntries] = useState([]);
-  const prevNodesRef = useRef(nodes);
-  useEffect(() => {
-    const newEntries = Object.entries(nodes)
-      .filter(([id, node]) => node.flagged && !prevNodesRef.current[id]?.flagged)
-      .map(([id, node]) => ({ id, pressure: node.pressure, flaggedAt: node.flaggedAt }));
-    if (newEntries.length > 0) {
-      setLogEntries((prev) => [...newEntries, ...prev].slice(0, MAX_LOG_ENTRIES));
-    }
-    prevNodesRef.current = nodes;
-  }, [nodes]);
+  useAlerts(nodes, (nodeId, node) => {
+    setLogEntries((prev) =>
+      [{ id: nodeId, pressure: node.pressure, flaggedAt: node.flaggedAt }, ...prev]
+        .slice(0, MAX_LOG_ENTRIES)
+    );
+  });
 
   const hasFlagged = useMemo(
     () => Object.values(nodes).some((n) => n.flagged),

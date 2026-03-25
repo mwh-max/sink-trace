@@ -4,6 +4,7 @@ import simulateFlow, { CONSECUTIVE_TICKS_THRESHOLD } from '../utils/simulateFlow
 import pipeEdges from '../data/pipeEdges.json';
 import { validateNodes } from '../utils/schema.js';
 import { NODES_KEY } from '../utils/storageKeys.js';
+import { appendHistory } from '../utils/historyStore.js';
 
 const SIMULATE_INTERVAL_MS = 3000;
 const LIVE_POLL_INTERVAL_MS = 5000;
@@ -51,6 +52,10 @@ export function useNodeData(mode, { flagThreshold = CONSECUTIVE_TICKS_THRESHOLD 
           edges: pipeEdges,
           consecutiveTicks: flagThreshold,
         });
+        // Persist long-term pressure history for each node.
+        for (const [id, node] of Object.entries(updated)) {
+          appendHistory(id, node.pressure);
+        }
         // Persist to localStorage only when state has actually changed.
         const serialized = JSON.stringify(updated);
         if (serialized !== lastSerializedRef.current) {
@@ -79,7 +84,11 @@ export function useNodeData(mode, { flagThreshold = CONSECUTIVE_TICKS_THRESHOLD 
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const raw = await res.json();
           if (cancelled) return;
-          applyNodes(validateNodes(raw));
+          const validated = validateNodes(raw);
+          for (const [id, node] of Object.entries(validated)) {
+            appendHistory(id, node.pressure);
+          }
+          applyNodes(validated);
         } catch (err) {
           if (cancelled) return;
           // Retain last known nodes — only surface the error.

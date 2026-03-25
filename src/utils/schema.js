@@ -6,9 +6,12 @@ export const NodeSchema = z.object({
   flowDirection: z.enum(['normal', 'reversed']),
   coords:        z.tuple([z.number(), z.number()]),
   // Topology metadata — optional so legacy stored data remains valid
-  type:      z.enum(['source', 'junction', 'endpoint']).optional(),
-  label:     z.string().optional(),
-  pressureMin: z.number().positive().optional(),
+  type:        z.enum(['source', 'junction', 'endpoint']).optional(),
+  label:       z.string().optional(),
+  pressureMin: z.number().positive().max(PRESSURE_MAX).optional(),
+  // Pump/booster nodes add this to outgoing pressure each tick.
+  // Never written by simulateFlow; set in node data only.
+  boostPressure: z.number().positive().optional(),
   // Runtime-only fields added by simulateFlow — optional on load
   consecutiveLowTicks: z.number().int().min(0).optional().default(0),
   history:   z.array(z.number()).optional(),
@@ -17,7 +20,10 @@ export const NodeSchema = z.object({
   // Acknowledgment is a user action — never written by simulateFlow.
   acknowledged:   z.boolean().optional().default(false),
   acknowledgedAt: z.number().nullable().optional().default(null),
-});
+}).refine(
+  n => !n.acknowledged || n.acknowledgedAt !== null,
+  { message: 'acknowledgedAt must be set when acknowledged is true' }
+);
 
 export const NodesSchema = z.record(z.string(), NodeSchema);
 
