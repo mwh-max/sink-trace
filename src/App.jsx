@@ -5,9 +5,10 @@ import MapErrorBoundary from "./components/MapErrorBoundary.jsx";
 import "./App.css";
 import { COLOR_SAFE, COLOR_CRITICAL } from "./utils/colors.js";
 
-const MAX_LOG_ENTRIES = 20;
 import { CONSECUTIVE_TICKS_THRESHOLD } from "./utils/simulateFlow.js";
 import { useNodeData } from "./hooks/useNodeData.js";
+
+const MAX_LOG_ENTRIES = 20;
 
 export default function App() {
   const [mode, setMode]               = useState("simulate");
