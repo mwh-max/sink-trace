@@ -12,8 +12,11 @@ export const NodeSchema = z.object({
   // Runtime-only fields added by simulateFlow — optional on load
   consecutiveLowTicks: z.number().int().min(0).optional().default(0),
   history:   z.array(z.number()).optional(),
-  flagged:   z.boolean().optional().default(false),
-  flaggedAt: z.number().nullable().optional().default(null),
+  flagged:        z.boolean().optional().default(false),
+  flaggedAt:      z.number().nullable().optional().default(null),
+  // Acknowledgment is a user action — never written by simulateFlow.
+  acknowledged:   z.boolean().optional().default(false),
+  acknowledgedAt: z.number().nullable().optional().default(null),
 });
 
 export const NodesSchema = z.record(z.string(), NodeSchema);
